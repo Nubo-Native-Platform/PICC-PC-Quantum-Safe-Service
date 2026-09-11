@@ -1,10 +1,10 @@
 module nnp-quantum-safe-service
 
-go 1.22.2
+go 1.24.0
 
 require (
-	github.com/cloudflare/circl v1.5.0
-	golang.org/x/crypto v0.23.0
+	github.com/cloudflare/circl v1.6.3
+	golang.org/x/crypto v0.30.0
 )
 
 require (
@@ -34,7 +34,7 @@ require (
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 )
 
 replace golang.org/x/sys => github.com/golang/sys v0.20.0
