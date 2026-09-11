@@ -1,0 +1,41 @@
+# Binaries and compiled output
+nnp-quantum-safe-service
+nnp-quantum-safe-service.exe
+bin/
+pqservice
+pqservice.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test and coverage artifacts
+*.out
+coverage.out
+coverage.html
+*.test
+
+# Environment files and credentials
+.env
+*.env
+!.env.example
+.env.local
+.env.*.local
+
+# Private keys, certificates, and secrets
+keys/*.key
+keys/*.pem
+keys/*.crt
+keys/*.json
+!keys/.gitkeep
+
+# Operating System & IDE metadata
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log

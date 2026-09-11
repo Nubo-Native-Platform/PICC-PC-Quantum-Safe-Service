@@ -1,0 +1,12 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+*.go text eol=lf
+*.sh text eol=lf
+*.md text
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+Makefile text eol=lf
+Dockerfile text eol=lf
+LICENSE text eol=lf
