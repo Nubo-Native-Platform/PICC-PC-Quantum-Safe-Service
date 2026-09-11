@@ -41,7 +41,7 @@ This document defines the architectural standards, development workflows, coding
 ## 2. Development Environment Setup
 
 ### Required Tools
-- **Go 1.24+** (tested with Go 1.24+ and Go 1.27+).
+- **Go 1.26+** (tested with Go 1.26+ and Go 1.27+).
 - **Git 2.40+** configured with your developer identity (`git config user.name` and `git config user.email`).
 - **Docker 24+** and **Docker Compose v2** for containerized local verification.
 - **Make** for running automated workflows.

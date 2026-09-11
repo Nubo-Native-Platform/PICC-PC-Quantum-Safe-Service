@@ -70,7 +70,7 @@ sequenceDiagram
 - **Architecture**: AMD64 (x86_64) or ARM64.
 
 ### Software Prerequisites
-- **Go**: 1.24+ (for compiling from source).
+- **Go**: 1.26+ (for compiling from source).
 - **Docker**: 24+ and Docker Compose v2.
 - **Kubernetes**: 1.28+ with Pod Security Admission active.
 

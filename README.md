@@ -1,7 +1,7 @@
 # PICC - PC - Quantum-Safe Service
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Go Version](https://img.shields.io/badge/Go-1.24%2B-00ADD8.svg?logo=go)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/Go-1.26%2B-00ADD8.svg?logo=go)](https://go.dev/)
 [![CNCF](https://img.shields.io/badge/CNCF-Cloud%20Native-blue.svg?logo=cncf)](https://www.cncf.io/)
 [![Build & Test](https://img.shields.io/badge/Build%20%26%20Test-Passing-success.svg?logo=githubactions)](.github/workflows/ci-cd.yml)
 [![Security Policy](https://img.shields.io/badge/Security-Policy-brightgreen.svg)](SECURITY.md)
@@ -120,7 +120,7 @@ By employing a hybrid design, the service enforces defense in depth: an adversar
 ## Quick Start
 
 ### Prerequisites
-- **Go**: 1.22+
+- **Go**: 1.26+
 - **Docker**: 24+ and Docker Compose v2
 
 ### Local Development
