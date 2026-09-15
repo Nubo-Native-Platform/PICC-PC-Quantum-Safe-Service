@@ -1,0 +1,2 @@
+# Do not commit cryptographic keys or certificates into this directory.
+# Runtime keys will be mounted or generated dynamically.

@@ -1,0 +1,24 @@
+services:
+  nnp-quantum-safe-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nnp-quantum-safe-service
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - GIN_MODE=release
+      - MLKEM_KEY_PATH=/app/keys/mlkem_private.key
+    volumes:
+      # Mount host keys directory for key persistence across restarts
+      - ./keys:/app/keys
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

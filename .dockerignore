@@ -1,0 +1,33 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Environment files and credentials
+.env*
+
+# Keys and secrets
+keys/
+*.key
+*.pem
+*.crt
+
+# Build and IDE artifacts
+*.exe
+bin/
+pqservice
+*.log
+.vscode/
+.idea/
+coverage.out
+coverage.html
+*.out
+
+# CI/CD and deployment
+.github/
+docker-compose*.yml
+Dockerfile
+Makefile
+
+# Documentation
+*.md

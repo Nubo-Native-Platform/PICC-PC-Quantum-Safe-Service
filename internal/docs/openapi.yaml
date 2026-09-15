@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: NNP Quantum-Safe Service
+  description: >
+    Hybrid post-quantum encryption API. Combines a classical X25519 (ECDH)
+    key exchange with post-quantum ML-KEM-768 (FIPS 203) key encapsulation,
+    merged via HKDF-SHA256 into a single AES-256-GCM key. Breaking either
+    the classical or the post-quantum leg alone is not enough to recover
+    the derived key (defense in depth).
+  version: "1.0.0"
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+tags:
+  - name: Health
+  - name: Keys
+  - name: Crypto
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Liveness check
+      operationId: getHealth
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+
+  /public-key:
+    get:
+      tags: [Keys]
+      summary: Fetch the server's long-term public keys
+      description: >
+        Returns the server's ML-KEM-768 and X25519 public keys, base64
+        encoded. A real external client would fetch these before calling
+        /encrypt.
+      operationId: getPublicKey
+      responses:
+        "200":
+          description: Public keys
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicKeyResponse"
+        "500":
+          description: Failed to marshal the public key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /encrypt:
+    post:
+      tags: [Crypto]
+      summary: Encrypt a plaintext string
+      description: >
+        Performs ML-KEM-768 encapsulation and a fresh ephemeral X25519 ECDH
+        exchange against the server's public keys, derives an AES-256 key
+        via HKDF-SHA256 from both shared secrets, and encrypts the
+        plaintext with AES-256-GCM. Every call produces fresh, single-use
+        ciphertext fields, even for identical plaintext.
+      operationId: postEncrypt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EncryptRequest"
+            example:
+              plaintext: "Hello, post-quantum world!"
+      responses:
+        "200":
+          description: Encryption succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EncryptResponse"
+        "400":
+          description: Invalid request body (e.g. missing plaintext)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Encryption failed server-side
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /decrypt:
+    post:
+      tags: [Crypto]
+      summary: Decrypt a previously encrypted payload
+      description: >
+        Requires the exact four ciphertext fields returned by a prior call
+        to /encrypt. Performs ML-KEM decapsulation and the matching X25519
+        ECDH using the server's private keys, re-derives the AES-256 key
+        via HKDF-SHA256, and AES-256-GCM decrypts. AES-GCM's authentication
+        tag rejects any tampered ciphertext with a 400.
+      operationId: postDecrypt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecryptRequest"
+      responses:
+        "200":
+          description: Decryption succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DecryptResponse"
+              example:
+                plaintext: "Hello, post-quantum world!"
+        "400":
+          description: >
+            Invalid request body, invalid base64 in a field, or
+            decryption/authentication failure (tampered or foreign
+            ciphertext)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+      required: [status]
+
+    PublicKeyResponse:
+      type: object
+      properties:
+        algorithm:
+          type: string
+          example: "Hybrid: X25519 + ML-KEM-768"
+        mlkem_public_key:
+          type: string
+          format: byte
+          description: Base64-encoded ML-KEM-768 public key (~1184 bytes decoded)
+        x25519_public_key:
+          type: string
+          format: byte
+          description: Base64-encoded X25519 public key (32 bytes decoded)
+      required: [algorithm, mlkem_public_key, x25519_public_key]
+
+    EncryptRequest:
+      type: object
+      properties:
+        plaintext:
+          type: string
+          description: The data to encrypt.
+          example: "Hello, post-quantum world!"
+      required: [plaintext]
+
+    EncryptResponse:
+      type: object
+      properties:
+        algorithm:
+          type: string
+          example: "Hybrid: X25519 + ML-KEM-768 + HKDF-SHA256 + AES-256-GCM"
+        kem_ciphertext:
+          type: string
+          format: byte
+          description: Base64-encoded ML-KEM-768 encapsulated ciphertext.
+        x25519_ephemeral_public:
+          type: string
+          format: byte
+          description: Base64-encoded ephemeral X25519 public key used for this message.
+        nonce:
+          type: string
+          format: byte
+          description: Base64-encoded AES-GCM nonce (12 bytes decoded).
+        ciphertext:
+          type: string
+          format: byte
+          description: Base64-encoded AES-256-GCM ciphertext (auth tag included).
+      required:
+        [algorithm, kem_ciphertext, x25519_ephemeral_public, nonce, ciphertext]
+
+    DecryptRequest:
+      type: object
+      properties:
+        kem_ciphertext:
+          type: string
+          format: byte
+        x25519_ephemeral_public:
+          type: string
+          format: byte
+        nonce:
+          type: string
+          format: byte
+        ciphertext:
+          type: string
+          format: byte
+      required: [kem_ciphertext, x25519_ephemeral_public, nonce, ciphertext]
+
+    DecryptResponse:
+      type: object
+      properties:
+        plaintext:
+          type: string
+      required: [plaintext]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
